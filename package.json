@@ -3,12 +3,8 @@
   "version": "1.0.0",
   "description": "Backend System Kaina Properti Abadi",
   "main": "index.js",
-  "engines": {
-    "node": ">=22.x"
-  },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -19,9 +15,7 @@
     "multer": "^2.0.2",
     "mysql2": "^3.6.0",
     "nodemailer": "^7.0.12",
+    "path": "^0.12.7",
     "uuid": "^9.0.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
   }
 }
