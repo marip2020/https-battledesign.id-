@@ -4,7 +4,8 @@
   "description": "Backend System Kaina Properti Abadi",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "echo 'No build needed'"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
