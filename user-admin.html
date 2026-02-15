@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaina Admin - Manajemen User</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        // --- PROTEKSI HALAMAN ---
+        // Menggunakan key yang sama dengan property-admin.html
+        const token = localStorage.getItem('admin_token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body class="bg-slate-50 p-4 md:p-8 font-sans text-slate-700">
+    <div class="max-w-6xl mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">Panel Admin Kaina</h1>
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Manajemen Pengguna & Hak Akses</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="fetchUsers()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-lg">
+                    <i class="fas fa-sync mr-1"></i> Refresh Data
+                </button>
+                <button onclick="logout()" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-lg">
+                    Keluar
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm mb-8 border border-slate-200">
+            <h2 id="formTitle" class="text-lg font-black mb-6 text-blue-700 flex items-center gap-2 uppercase tracking-tight">
+                <i class="fas fa-user-plus"></i> Tambah User Baru
+            </h2>
+            
+            <form id="userForm" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <input type="hidden" id="userId">
+                
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-black uppercase text-slate-400 mb-2">Nama Lengkap</label>
+                    <input type="text" id="full_name" class="w-full border border-slate-200 p-3 rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Nama Lengkap User" required>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-black uppercase text-slate-400 mb-2">Email (Username)</label>
+                    <input type="email" id="email" class="w-full border border-slate-200 p-3 rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="email@kaina.com" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black uppercase text-slate-400 mb-2">Role / Jabatan</label>
+                    <select id="role" class="w-full border border-slate-200 p-3 rounded-xl bg-slate-50 font-bold outline-none">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="AGENT">AGENT</option>
+                        <option value="ARCHITECT">ARCHITECT</option>
+                        <option value="CONTRACTOR">CONTRACTOR</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black uppercase text-slate-400 mb-2">No. HP (WhatsApp)</label>
+                    <input type="text" id="phone" class="w-full border border-slate-200 p-3 rounded-xl bg-slate-50 outline-none" placeholder="0812...">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-black uppercase text-slate-400 mb-2">Password</label>
+                    <input type="password" id="password" class="w-full border border-slate-200 p-3 rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Isi password baru">
+                </div>
+
+                <div class="md:col-span-4 flex justify-end gap-3">
+                    <button type="button" id="btnCancel" onclick="resetForm()" class="hidden bg-slate-200 text-slate-600 font-black py-4 px-8 rounded-2xl hover:bg-slate-300 transition uppercase tracking-widest text-sm">
+                        Batal
+                    </button>
+                    <button type="submit" id="submitBtn" class="w-full md:w-auto bg-blue-600 text-white font-black py-4 px-12 rounded-2xl hover:bg-blue-700 transition shadow-xl uppercase tracking-widest text-sm">
+                        Simpan User
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-white">
+                            <th class="p-5 font-black uppercase text-[10px]">Info Pengguna</th>
+                            <th class="p-5 font-black uppercase text-[10px] text-center">Role</th>
+                            <th class="p-5 font-black uppercase text-[10px]">Kontak</th>
+                            <th class="p-5 font-black uppercase text-[10px] text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr><td colspan="4" class="p-10 text-center font-bold text-slate-400 italic">Memuat database user...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://kainapropertiabadi.co.id/api';
+        let allUsers = [];
+        let isEditMode = false;
+
+        // --- 1. FETCH DATA ---
+        async function fetchUsers() {
+            const body = document.getElementById('userTableBody');
+            try {
+                const res = await fetch(`${API_BASE}/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                body.innerHTML = '';
+                
+                if(!result.data || result.data.length === 0) {
+                    body.innerHTML = '<tr><td colspan="4" class="p-10 text-center font-bold text-slate-300">Tidak ada user terdaftar.</td></tr>';
+                    return;
+                }
+
+                allUsers = result.data;
+                result.data.forEach(user => {
+                    body.innerHTML += `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                            <td class="p-5">
+                                <div class="font-black text-slate-800">${user.full_name}</div>
+                                <div class="text-[11px] text-blue-500 font-mono">${user.email}</div>
+                            </td>
+                            <td class="p-5 text-center">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-600 ring-1 ring-slate-200">${user.role}</span>
+                            </td>
+                            <td class="p-5 text-slate-500 font-medium">
+                                <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> ${user.phone || '-'}
+                            </td>
+                            <td class="p-5 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <button onclick="prepareEdit('${user.id}')" class="text-blue-500 hover:bg-blue-50 w-8 h-8 rounded-lg transition"><i class="fas fa-edit"></i></button>
+                                    <button onclick="deleteUser('${user.id}')" class="text-rose-500 hover:bg-rose-50 w-8 h-8 rounded-lg transition"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+            } catch (e) {
+                body.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-rose-500 font-bold">Gagal mengambil data user.</td></tr>';
+            }
+        }
+
+        // --- 2. SUBMIT HANDLER ---
+        document.getElementById('userForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const id = document.getElementById('userId').value;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+
+            const payload = {
+                email: document.getElementById('email').value,
+                full_name: document.getElementById('full_name').value,
+                phone: document.getElementById('phone').value,
+                role: document.getElementById('role').value
+            };
+
+            const password = document.getElementById('password').value;
+            if (password.trim() !== "") payload.password = password;
+
+            const url = isEditMode ? `${API_BASE}/users/${id}` : `${API_BASE}/users`;
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert(isEditMode ? 'User diperbarui!' : 'User baru ditambahkan!');
+                    resetForm();
+                    fetchUsers();
+                } else {
+                    const err = await res.json();
+                    alert("Gagal: " + err.message);
+                }
+            } catch (err) {
+                alert("Kesalahan server.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Simpan User';
+            }
+        };
+
+        // --- 3. EDIT & RESET ---
+        function prepareEdit(id) {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+
+            isEditMode = true;
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Informasi User';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('email').value = user.email;
+            document.getElementById('full_name').value = user.full_name;
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('role').value = user.role;
+            
+            document.getElementById('password').placeholder = "Biarkan kosong jika tidak ganti password";
+            document.getElementById('btnCancel').classList.remove('hidden');
+            document.getElementById('submitBtn').innerText = "Update User";
+            document.getElementById('submitBtn').classList.replace('bg-blue-600', 'bg-amber-500');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            isEditMode = false;
+            document.getElementById('userForm').reset();
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-user-plus"></i> Tambah User Baru';
+            document.getElementById('submitBtn').innerText = "Simpan User";
+            document.getElementById('submitBtn').classList.replace('bg-amber-500', 'bg-blue-600');
+            document.getElementById('btnCancel').classList.add('hidden');
+            document.getElementById('password').placeholder = "Isi password baru";
+        }
+
+        // --- 4. DELETE ---
+        async function deleteUser(id) {
+            if(!confirm('Hapus user ini secara permanen?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/users/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(res.ok) fetchUsers();
+                else {
+                    const err = await res.json();
+                    alert(err.message || "Gagal menghapus.");
+                }
+            } catch (e) { alert("Kesalahan server."); }
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = 'login.html';
+        }
+
+        // Init load
+        fetchUsers();
+    </script>
+</body>
+</html>

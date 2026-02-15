@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaina Admin - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        // --- PROTEKSI HALAMAN ---
+        const token = localStorage.getItem('admin_token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Fungsi decode token untuk ambil data user
+        function getUserInfo() {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                return JSON.parse(window.atob(base64));
+            } catch (e) { return { name: "Admin", role: "USER" }; }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-700">
+
+    <div class="flex min-h-screen">
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:block">
+            <div class="p-6">
+                <h1 class="text-xl font-black text-blue-600 tracking-tighter">KAINA<span class="text-slate-800">ADMIN</span></h1>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Management System</p>
+            </div>
+            <nav class="mt-4 px-4 space-y-2">
+                <a href="dashboard.html" class="flex items-center gap-3 p-3 rounded-lg bg-blue-600 text-white font-semibold shadow-md">
+                    <i class="fas fa-th-large w-5"></i> Dashboard
+                </a>
+                <a href="property-admin.html" class="flex items-center gap-3 p-3 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+                    <i class="fas fa-home w-5"></i> Properti Saya
+                </a>
+                <a href="user-admin.html" id="nav-user-admin" class="flex items-center gap-3 p-3 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+                    <i class="fas fa-users-cog w-5"></i> Manajemen User
+                </a>
+                <div class="pt-4 pb-2 px-3">
+                    <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Akun</p>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center gap-3 p-3 rounded-lg text-rose-500 hover:bg-rose-50 transition">
+                    <i class="fas fa-sign-out-alt w-5"></i> Keluar
+                </button>
+            </nav>
+        </aside>
+
+        <main class="flex-1">
+            <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center px-8">
+                <div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Selamat Datang,</p>
+                    <h2 id="user-display-name" class="text-lg font-bold text-slate-800 tracking-tight">Memuat...</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="user-role-badge" class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-tighter">--</span>
+                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500">
+                        <i class="fas fa-user-circle text-xl"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 transition hover:shadow-md">
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                            <i class="fas fa-home text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Total Listing</p>
+                            <h3 id="stat-total-listing" class="text-3xl font-black text-slate-800">--</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 transition hover:shadow-md">
+                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Properti Aktif</p>
+                            <h3 id="stat-properti-aktif" class="text-3xl font-black text-slate-800">--</h3>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 transition hover:shadow-md">
+                        <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Total Agen</p>
+                            <h3 id="stat-total-agen" class="text-3xl font-black text-slate-800">--</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-slate-200 transition hover:scale-[1.01]">
+                        <div class="relative z-10">
+                            <h3 class="text-2xl font-bold mb-2">Manajemen Properti</h3>
+                            <p class="text-slate-400 text-sm mb-6 max-w-xs">Update harga, ganti foto, atau tambahkan listing unit properti baru.</p>
+                            <a href="property-admin.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition active:scale-95 shadow-lg shadow-blue-500/20">
+                                Buka Listing <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                            </a>
+                        </div>
+                        <i class="fas fa-building text-9xl text-slate-800 absolute -right-4 -bottom-4 opacity-50"></i>
+                    </div>
+
+                    <div id="card-user-admin" class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden transition hover:scale-[1.01]">
+                        <div class="relative z-10">
+                            <h3 class="text-2xl font-bold mb-2 text-slate-800">Manajemen Akses</h3>
+                            <p class="text-gray-400 text-sm mb-6 max-w-xs">Tambah atau hapus akun Agen, Kontraktor, dan Arsitek Kaina.</p>
+                            <a href="user-admin.html" class="inline-block bg-slate-800 hover:bg-slate-950 text-white font-bold py-3 px-6 rounded-xl transition active:scale-95">
+                                Kelola User <i class="fas fa-user-shield ml-2 text-xs"></i>
+                            </a>
+                        </div>
+                        <i class="fas fa-users text-9xl text-slate-50 absolute -right-4 -bottom-4 opacity-80"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-slate-800 text-lg">Log Aktivitas Sistem</h3>
+                        <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase">Real-time Data</span>
+                    </div>
+                    <div id="activity-list" class="space-y-4">
+                        <div class="flex gap-4 items-start pb-4 border-b border-slate-50">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">Memuat riwayat aktivitas terbaru...</p>
+                                <p class="text-xs text-slate-400">Harap tunggu sebentar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = 'https://kainapropertiabadi.co.id/api';
+
+        // 1. Ambil Statistik dari Server
+        async function fetchStats() {
+            try {
+                const res = await fetch(`${API_BASE}/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    // Update tampilan angka dengan animasi sederhana
+                    document.getElementById('stat-total-listing').innerText = result.data.total_listing || 0;
+                    document.getElementById('stat-properti-aktif').innerText = result.data.properti_aktif || 0;
+                    document.getElementById('stat-total-agen').innerText = result.data.total_agen || 0;
+                }
+            } catch (err) {
+                console.error("Gagal memuat statistik", err);
+            }
+        }
+
+        // 2. Logout Handler
+        function logout() {
+            if(confirm('Apakah Anda ingin keluar dari Panel Kaina?')) {
+                localStorage.removeItem('admin_token');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 3. Inisialisasi & Proteksi Role
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getUserInfo();
+            
+            // Set Display Nama & Role
+            document.getElementById('user-display-name').innerText = user.name || "Administrator";
+            document.getElementById('user-role-badge').innerText = user.role || "UNKNOWN";
+
+            // Sembunyikan fitur User Management jika bukan ADMIN
+            if (user.role !== 'ADMIN') {
+                const userNav = document.getElementById('nav-user-admin');
+                const userCard = document.getElementById('card-user-admin');
+                if (userNav) userNav.remove();
+                if (userCard) userCard.remove();
+            }
+
+            fetchStats();
+        });
+    </script>
+</body>
+</html>
