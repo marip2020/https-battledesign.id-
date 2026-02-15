@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaina Admin - Dashboard</title>
+    <title>battledesign.id Admin - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
@@ -28,7 +28,7 @@
     <div class="flex min-h-screen">
         <aside class="w-64 bg-white border-r border-gray-200 hidden md:block">
             <div class="p-6">
-                <h1 class="text-xl font-black text-blue-600 tracking-tighter">KAINA<span class="text-slate-800">ADMIN</span></h1>
+                <h1 class="text-xl font-black text-blue-600 tracking-tighter">battledesign<span class="text-slate-800">ADMIN</span></h1>
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Management System</p>
             </div>
             <nav class="mt-4 px-4 space-y-2">
@@ -112,7 +112,7 @@
                     <div id="card-user-admin" class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm relative overflow-hidden transition hover:scale-[1.01]">
                         <div class="relative z-10">
                             <h3 class="text-2xl font-bold mb-2 text-slate-800">Manajemen Akses</h3>
-                            <p class="text-gray-400 text-sm mb-6 max-w-xs">Tambah atau hapus akun Agen, Kontraktor, dan Arsitek Kaina.</p>
+                            <p class="text-gray-400 text-sm mb-6 max-w-xs">Tambah atau hapus akun Agen, Kontraktor, dan Arsitek battledesign.id.</p>
                             <a href="user-admin.html" class="inline-block bg-slate-800 hover:bg-slate-950 text-white font-bold py-3 px-6 rounded-xl transition active:scale-95">
                                 Kelola User <i class="fas fa-user-shield ml-2 text-xs"></i>
                             </a>
@@ -143,7 +143,7 @@
     </div>
 
     <script>
-        const API_BASE = 'https://kainapropertiabadi.co.id/api';
+        const API_BASE = 'https://battledesign.id/api';
 
         // 1. Ambil Statistik dari Server
         async function fetchStats() {
@@ -166,7 +166,7 @@
 
         // 2. Logout Handler
         function logout() {
-            if(confirm('Apakah Anda ingin keluar dari Panel Kaina?')) {
+            if(confirm('Apakah Anda ingin keluar dari Panel battledesign.id ?')) {
                 localStorage.removeItem('admin_token');
                 window.location.href = 'login.html';
             }
