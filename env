@@ -1,0 +1,15 @@
+# Database Configuration
+DB_HOST=localhost
+DB_USER=n1578761_admin_kaina
+DB_PASSWORD=Republic2026*
+DB_NAME=n1578761_kaina_db
+
+# Server Configuration
+PORT=3000
+JWT_SECRET=KAINA_PROPERTI_SUPER_SECRET_2026
+
+# Email Configuration (SMTP Niagahoster)
+# Gunakan mail.domainanda jika smtp.hostinger tidak merespon di cPanel
+EMAIL_HOST=mail.kainapropertiabadi.co.id
+EMAIL_USER=admin@kainapropertiabadi.co.id
+EMAIL_PASS=Januari2026*
