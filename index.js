@@ -168,10 +168,10 @@ app.post('/api/forgot-password', async (req, res) => {
             [token, users[0].id]
         );
 
-        const resetLink = `https://kainapropertiabadi.co.id/reset-password.html?token=${token}`;
+        const resetLink = `https://battledesign.id/reset-password.html?token=${token}`;
 
         await transporter.sendMail({
-            from: `"Kaina Properti" <${process.env.EMAIL_USER}>`,
+            from: `"battledesign" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: 'Reset Password Akun Anda',
             html: `
@@ -351,5 +351,5 @@ app.get('/api/stats', authenticateToken, async (req, res) => {
 // ======================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 Server Kaina Properti berjalan di port ${PORT}`);
+    console.log(`🚀 Server battledesign.id berjalan di port ${PORT}`);
 });
