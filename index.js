@@ -12,7 +12,7 @@ const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
-const SECRET_KEY = process.env.JWT_SECRET || 'KAINA_PROPERTI_SUPER_SECRET_2026';
+const SECRET_KEY = process.env.JWT_SECRET || 'battledesign_SUPER_SECRET_2026';
 
 // ======================================================
 // MIDDLEWARE
@@ -38,7 +38,7 @@ const pool = mysql.createPool({
 // EMAIL CONFIGURATION
 // ======================================================
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'mail.kainapropertiabadi.co.id',
+    host: process.env.EMAIL_HOST || 'mail.battledesign.id',
     port: 465,
     secure: true,
     auth: {
