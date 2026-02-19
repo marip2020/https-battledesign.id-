@@ -1,8 +1,8 @@
 # Database Configuration
 DB_HOST=localhost
-DB_USER=n1578761_admin_kaina
+DB_USER=u154338680_admin_kaina
 DB_PASSWORD=Republic2026*
-DB_NAME=n1578761_kaina_db
+DB_NAME=u154338680_kaina_db
 
 # Server Configuration
 PORT=3000
